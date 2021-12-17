@@ -1,0 +1,18 @@
+# 配置数据源
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://127.0.0.1:3306/mall?characterEncoding=utf-8&useSSL=false&serverTimezone=UTC
+# 自动映射 例如：createTime与数据库的create_time会自动映射，不用特别标注
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  # 配置xml文件所在的路径要不找不到
+  mapper-locations: classpath:mappers/*.xml
+# 控制台打印日志的配置：此配置为省略控制台输出的时间
+logging:
+  pattern:
+    console: "[%thread] %-5level %logger{36} - %msg%n"
+
