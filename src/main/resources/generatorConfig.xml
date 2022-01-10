@@ -18,6 +18,9 @@
    <classPathEntry location="D:\java\apache-maven-3.6.3\mysql-connector-java-5.1.6.jar" />
      <context id="DB2Tables" targetRuntime="MyBatis3">
 
+         <!-- 不再追加xml内容 -->
+         <plugin type="org.mybatis.generator.plugins.UnmergeableXmlMappersPlugin"/>
+
          <!--去掉生成的文件中大量注释-->
          <commentGenerator>
              <property name="suppressAllComments" value="true"/>
@@ -52,7 +55,7 @@
              <property name="enableSubPackages" value="true"/>
 
              <!-- 设置是否在getter方法中，对String类型字段调用trim()方法 -->
-             <property name="trimStrings" value="true"/>
+<!--             <property name="trimStrings" value="true"/>-->
          </javaModelGenerator>
 
 
@@ -82,7 +85,13 @@
          </javaClientGenerator>
 
 
-         <table tableName="mall_order" domainObjectName="Order"/>
+<!--         <table tableName="mall_order" domainObjectName="Order" enableCountByExample="false" enableDeleteByExample="false" enableUpdateByExample="false" enableSelectByExample="false"/>-->
+
+<!--         <table tableName="mall_order_item" domainObjectName="OrderItem" enableCountByExample="false" enableDeleteByExample="false" enableUpdateByExample="false" enableSelectByExample="false"/>-->
+
+<!--         <table tableName="mall_pay_info" domainObjectName="PayInfo" enableCountByExample="false" enableDeleteByExample="false" enableUpdateByExample="false" enableSelectByExample="false"/>-->
+
+         <table tableName="mall_user" domainObjectName="User" enableCountByExample="false" enableDeleteByExample="false" enableUpdateByExample="false" enableSelectByExample="false"/>
      </context>
 <!--    &lt;!&ndash;-->
 <!--        context:生成一组对象的环境-->
