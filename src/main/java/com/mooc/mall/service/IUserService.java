@@ -2,6 +2,7 @@ package com.mooc.mall.service;
 
 
 import com.mooc.mall.pojo.User;
+import com.mooc.mall.vo.ResponseVo;
 
 /**
  * @Author gaomy
@@ -16,10 +17,13 @@ public interface IUserService {
     /**
      * 注册
      */
-    void register(User user);
+    ResponseVo<User> register(User user);
 
 
     /**
      * 登录
      */
+    ResponseVo<User> login(String username,String password);
+
+
 }
