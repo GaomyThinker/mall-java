@@ -5,6 +5,7 @@ import com.mooc.mall.vo.CategoryVo;
 import com.mooc.mall.vo.ResponseVo;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author gaomy
@@ -17,4 +18,6 @@ import java.util.List;
 public interface CategoryService {
 
     ResponseVo<List<CategoryVo>> selectAll();
+
+    void findSubCategoryId(Integer id, Set<Integer> resultSet);
 }

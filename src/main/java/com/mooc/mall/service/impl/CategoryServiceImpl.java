@@ -9,11 +9,13 @@ import com.mooc.mall.vo.CategoryVo;
 import com.mooc.mall.vo.ResponseVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -29,6 +31,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryMapper categoryMapper;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Override
     public ResponseVo<List<CategoryVo>> selectAll() {
@@ -44,6 +48,7 @@ public class CategoryServiceImpl implements CategoryService {
 //            }
 //        }
 
+        // 先查出全部的类目，方便下面的分级都从这些数据中查，因为一直查数据库会影响效率
         // lambda + stream
         List<CategoryVo> categoryVoList = categories.stream()
                 .filter(e -> e.getParentId().equals(MallConst.ROOT_PARENT_ID))
@@ -57,6 +62,12 @@ public class CategoryServiceImpl implements CategoryService {
         return ResponseVo.success(categoryVoList);
     }
 
+
+    /**
+     * 把父级目录和总的数据当做参数，方便递归查询
+     * @param categoryVoList
+     * @param categories
+     */
     private void findSubCategory(List<CategoryVo> categoryVoList,List<Category> categories){
         for (CategoryVo categoryVo:categoryVoList) {
             List<CategoryVo> subCategoryVoList =new ArrayList<>();
@@ -74,9 +85,33 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
+    /**
+     * 类的转化，从category转化为CategoryVo
+     * @param category
+     * @return
+     */
     private CategoryVo categoryToCategoryVo(Category category){
         CategoryVo categoryVo=new CategoryVo();
         BeanUtils.copyProperties(category,categoryVo);
         return categoryVo;
+    }
+
+
+    // 得到所有的categoryId
+    @Override
+    public void findSubCategoryId(Integer id, Set<Integer> resultSet) {
+        List<Category> categories = categoryMapper.selectAll();
+        findSubCategoryId(id,resultSet,categories);
+
+    }
+
+    public void findSubCategoryId(Integer id, Set<Integer> resultSet,List<Category> categories) {
+        for (Category category:categories){
+            if (category.getParentId().equals(id)){
+                resultSet.add(category.getId());
+                findSubCategoryId(category.getId(),resultSet,categories);
+            }
+        }
+
     }
 }
