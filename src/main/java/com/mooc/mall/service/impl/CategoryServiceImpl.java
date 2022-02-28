@@ -34,6 +34,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    // 得到所有商品类目
     @Override
     public ResponseVo<List<CategoryVo>> selectAll() {
         List<Category> categories = categoryMapper.selectAll();
@@ -95,6 +96,10 @@ public class CategoryServiceImpl implements CategoryService {
         BeanUtils.copyProperties(category,categoryVo);
         return categoryVo;
     }
+
+
+
+
 
 
     // 得到所有的categoryId

@@ -54,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseVo<PageInfo> list(Integer categoryId, Integer pageNum, Integer pageSize) {
         Set<Integer> categoryIdSet=new HashSet<>();
-        // 要先判断category是否为null，否则会set一个null值，使set的size为1，导致sql语句还会执行in（null)
+        // 要先判断categoryId是否为null，否则会set一个null值，使set的size为1，导致sql语句还会执行in（null)
         if (null!=categoryId){
             categoryService.findSubCategoryId(categoryId,categoryIdSet);
             categoryIdSet.add(categoryId);

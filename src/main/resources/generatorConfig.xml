@@ -92,10 +92,12 @@
 <!--         <table tableName="mall_pay_info" domainObjectName="PayInfo" enableCountByExample="false" enableDeleteByExample="false" enableUpdateByExample="false" enableSelectByExample="false"/>-->
 
 <!--         <table tableName="mall_category" domainObjectName="Category" enableCountByExample="false" enableDeleteByExample="false" enableUpdateByExample="false" enableSelectByExample="false"/>-->
-         <table tableName="mall_product" domainObjectName="Product" enableCountByExample="false" enableDeleteByExample="false" enableUpdateByExample="false" enableSelectByExample="false">
-             <columnOverride column="detail" jdbcType="VARCHAR"/>
-             <columnOverride column="sub_images" jdbcType="VARCHAR"/>
-         </table>
+
+<!--         <table tableName="mall_product" domainObjectName="Product" enableCountByExample="false" enableDeleteByExample="false" enableUpdateByExample="false" enableSelectByExample="false">-->
+<!--             <columnOverride column="detail" jdbcType="VARCHAR"/>-->
+<!--             <columnOverride column="sub_images" jdbcType="VARCHAR"/>-->
+<!--         </table>-->
+         <table tableName="mall_shipping" domainObjectName="Shipping" enableCountByExample="false" enableDeleteByExample="false" enableUpdateByExample="false" enableSelectByExample="false"/>
      </context>
 <!--    &lt;!&ndash;-->
 <!--        context:生成一组对象的环境-->

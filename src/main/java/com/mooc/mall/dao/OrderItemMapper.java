@@ -1,6 +1,10 @@
 package com.mooc.mall.dao;
 
+import com.mooc.mall.pojo.Order;
 import com.mooc.mall.pojo.OrderItem;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface OrderItemMapper {
     int deleteByPrimaryKey(Integer id);
@@ -14,4 +18,9 @@ public interface OrderItemMapper {
     int updateByPrimaryKeySelective(OrderItem record);
 
     int updateByPrimaryKey(OrderItem record);
+
+    int batchInsert(@Param("orderItemList") List<OrderItem> orderItemList);
+
+    List<Order> selectByUid(Integer uid);
+
 }

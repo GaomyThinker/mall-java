@@ -23,6 +23,7 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
+    //所有类目
     @GetMapping("/categories")
     public ResponseVo<List<CategoryVo>> selectAll(){
         ResponseVo<List<CategoryVo>> listResponseVo = categoryService.selectAll();
