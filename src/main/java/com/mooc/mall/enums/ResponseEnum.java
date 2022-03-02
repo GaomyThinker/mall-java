@@ -41,6 +41,10 @@ public enum ResponseEnum {
     SHIPPING_NOT_EXIT(17,"收货地址不存在"),
 
     CAR_SELECTED_ID_EMPTY(18,"请选择商品后下单"),
+
+    ORDER_NOT_EXIT(19,"订单不存在"),
+
+    ORDER_STATUS_ERROR(20,"订单状态错误"),
     ;
 
     Integer code;

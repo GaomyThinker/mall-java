@@ -1,6 +1,7 @@
 package com.mooc.mall.service.impl;
 
 
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.mooc.mall.dao.OrderItemMapper;
 import com.mooc.mall.dao.OrderMapper;
@@ -145,8 +146,10 @@ public class OrderServiceImpl implements OrderService {
         }).collect(Collectors.toList());
 
         orderVo.setOrderItemVoList(orderItemVoList);
-        orderVo.setShippingId(shipping.getId());
-        orderVo.setShippingVo(shipping);
+        if (shipping!=null){
+            orderVo.setShippingId(shipping.getId());
+            orderVo.setShippingVo(shipping);
+        }
         return orderVo;
     }
 
@@ -204,19 +207,95 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public ResponseVo<PageInfo> list(Integer uid, Integer pageNum, Integer pageSize) {
+        // 查出改用户所有的订单
+        PageHelper.startPage(pageNum,pageSize);
+        List<Order> orders = orderMapper.selectByUid(uid);
 
-        return null;
+        // 根据所有的订单号查询所有的orderItem
+        Set<Long> orderNoSet = orders.stream().map(Order::getOrderNo).collect(Collectors.toSet());
+        List<OrderItem> orderItemList = orderItemMapper.selectByOrderNoSet(orderNoSet);
+
+        // Collectors.groupingBy根据一个或多个属性对集合中的项目进行分组
+        Map<Long,List<OrderItem>> map=orderItemList.stream()
+                .collect(Collectors.groupingBy(OrderItem::getOrderNo));
+
+        // 根据订单查出所有订单中的地址
+        Set<Integer> shippingIdSet = orders.stream().map(Order::getShippingId).collect(Collectors.toSet());
+        List<Shipping> shippingList = shippingMapper.selectByIdSet(shippingIdSet);
+        Map<Integer, Shipping> shippingMap = shippingList.stream()
+                .collect(Collectors.toMap(Shipping::getId, shipping -> shipping));
+
+        List<OrderVo> orderVoList=new ArrayList<>();
+        for (Order order : orders) {
+            OrderVo orderVo = buildOrderVo(order, map.get(order.getOrderNo()), shippingMap.get(order.getShippingId()));
+            orderVoList.add(orderVo);
+        }
+
+        PageInfo pageInfo=new PageInfo(orders);
+        pageInfo.setList(orderVoList);
+        return ResponseVo.success(pageInfo);
     }
 
     /**
      * 订单详情
      * @param uid 传入uid，是保证只能查自己的订单
-     * @param orderId
+     * @param orderNo
      * @return
      */
     @Override
-    public ResponseVo<OrderVo> detail(Integer uid, Integer orderId) {
-        return null;
+    public ResponseVo<OrderVo> detail(Integer uid, Long orderNo) {
+        // 不写selectByUidAndOrderNo是因为加入是管理员，他可以查所有人的order,就不能根据uid查询了
+        Order order = orderMapper.selectByOrderNo(orderNo);
+        if(order==null || !order.getUserId().equals(uid)){
+            return ResponseVo.error(ResponseEnum.ORDER_NOT_EXIT);
+        }
+        Set<Long> orderNoSet=new HashSet<Long>();
+        orderNoSet.add(orderNo);
+        List<OrderItem> orderItemList = orderItemMapper.selectByOrderNoSet(orderNoSet);
+
+        Shipping shipping=shippingMapper.selectByPrimaryKey(order.getShippingId());
+        OrderVo orderVo = buildOrderVo(order, orderItemList, shipping);
+        return ResponseVo.success(orderVo);
+    }
+
+    @Override
+    public ResponseVo cancel(Integer uid, Long orderNo) {
+        Order order = orderMapper.selectByOrderNo(orderNo);
+        if(order==null || !order.getUserId().equals(uid)){
+            return ResponseVo.error(ResponseEnum.ORDER_NOT_EXIT);
+        }
+        // 只有未付款状态的订单才可以取消
+        if (!order.getStatus().equals(OrderStatusEnum.NO_PAY.getCode())){
+            return ResponseVo.error(ResponseEnum.ORDER_STATUS_ERROR);
+        }
+
+        order.setStatus(OrderStatusEnum.CANCELED.getCode());
+        order.setCloseTime(new Date());
+        int row = orderMapper.updateByPrimaryKeySelective(order);
+        if (row<=0){
+            return ResponseVo.error(ResponseEnum.ERROR);
+        }
+
+        return ResponseVo.success();
+    }
+
+    @Override
+    public void paid(Long orderNo) {
+        Order order = orderMapper.selectByOrderNo(orderNo);
+        if(order==null){
+            throw new RuntimeException(ResponseEnum.ORDER_NOT_EXIT.getDesc()+"订单id:"+orderNo);
+        }
+        // 只有未付款状态的订单可以变成已付款
+        if (!order.getStatus().equals(OrderStatusEnum.NO_PAY.getCode())){
+            throw new RuntimeException(ResponseEnum.ORDER_STATUS_ERROR.getDesc()+"订单id:"+orderNo);
+        }
+
+        order.setStatus(OrderStatusEnum.CANCELED.getCode());
+        order.setPaymentTime(new Date());
+        int row = orderMapper.updateByPrimaryKeySelective(order);
+        if (row<=0){
+            throw new RuntimeException("将订单更新为已支付状态失败");
+        }
     }
 
 

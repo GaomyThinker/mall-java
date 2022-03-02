@@ -1,10 +1,10 @@
 package com.mooc.mall.dao;
 
-import com.mooc.mall.pojo.Order;
 import com.mooc.mall.pojo.OrderItem;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 public interface OrderItemMapper {
     int deleteByPrimaryKey(Integer id);
@@ -21,6 +21,6 @@ public interface OrderItemMapper {
 
     int batchInsert(@Param("orderItemList") List<OrderItem> orderItemList);
 
-    List<Order> selectByUid(Integer uid);
+    List<OrderItem> selectByOrderNoSet(@Param("orderNoSet") Set orderNoSet);
 
 }

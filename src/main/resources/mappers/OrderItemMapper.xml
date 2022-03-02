@@ -179,10 +179,19 @@
       )
     </foreach>
   </insert>
-  <select id="selectByUid" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+
+
+  <select id="selectByOrderNoSet"  resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from mall_order_item
-    where user_id = #{uid,jdbcType=INTEGER}
+    <where>
+      <if test="orderNoSet.size()>0">
+        order_no in
+        <foreach collection="orderNoSet" item="item" index="index" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+    </where>
   </select>
 </mapper>
